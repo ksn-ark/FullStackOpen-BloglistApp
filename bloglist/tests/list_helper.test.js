@@ -104,3 +104,37 @@ describe('most likes', () => {
     expect(result).toBe(listWithManyBlog[2])
   })
 })
+
+describe('most blog', () => {
+  test('of empty list is null', () => {
+    const result = listHelper.mostBlogs(listWithNoBlogs)
+    expect(result).toBe(null)
+  })
+
+  test('when list has only one blog, equals that blog', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog)
+    expect(result).toStrictEqual({ author: 'Edsger W. Dijkstra', blogs: 1 })
+  })
+
+  test('of a bigger list it finds the one with most blogs', () => {
+    const result = listHelper.mostBlogs(listWithManyBlog)
+    expect(result).toStrictEqual({ author: 'Robert C. Martin', blogs: 3 })
+  })
+})
+
+describe('most likes', () => {
+  test('of empty list is null', () => {
+    const result = listHelper.mostLikes(listWithNoBlogs)
+    expect(result).toBe(null)
+  })
+
+  test('when list has only one blog, equals that blog', () => {
+    const result = listHelper.mostLikes(listWithOneBlog)
+    expect(result).toStrictEqual({ author: 'Edsger W. Dijkstra', likes: 5 })
+  })
+
+  test('of a bigger list it finds the one with most likes', () => {
+    const result = listHelper.mostLikes(listWithManyBlog)
+    expect(result).toStrictEqual({ author: 'Edsger W. Dijkstra', likes: 17 })
+  })
+})
