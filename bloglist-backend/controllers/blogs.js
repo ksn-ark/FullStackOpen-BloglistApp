@@ -1,6 +1,5 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {
@@ -13,10 +12,13 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.post('/', async (request, response) => {
-  const users = await User.find({})
-  const user = users[0]
+  const user = request.user
 
-  const blog = new Blog({ user: user._id, ...request.body })
+  if (!user) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+
+  const blog = new Blog({ user: user.id, ...request.body })
 
   const savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
@@ -26,7 +28,18 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
+  const user = request.user
+
+  const blogToDelete = await Blog.findById(request.params.id)
+
+  if (
+    !user.id || blogToDelete ? blogToDelete.user.toString() !== user.id : false
+  ) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
   await Blog.findByIdAndDelete(request.params.id)
+  user.blogs = user.blogs.splice(user.blogs.indexOf(request.params.id), 1)
+  await user.save()
 
   response.status(204).end()
 })
