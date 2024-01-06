@@ -12,13 +12,7 @@ import Togglable from "./components/Togglable";
 const App = () => {
   const [blogs, setBlogs] = useState([]);
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
 
   const [errorMessage, setErrorMessage] = useState(null);
   const [isError, setIsError] = useState(false);
@@ -41,27 +35,23 @@ const App = () => {
   const blogFormRef = useRef();
 
   //eventHandlers
-  const handleLogin = async (event) => {
-    event.preventDefault();
-
-    try {
-      const user = await loginService.login({
-        username,
-        password,
+  const handleLogin = (user) => {
+    loginService
+      .login(user)
+      .then((user) => {
+        window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user));
+        blogService.setToken(user.token);
+        setUser(user);
+        return;
+      })
+      .catch((error) => {
+        setIsError(true);
+        setErrorMessage(error.response.data.error);
+        setTimeout(() => {
+          setErrorMessage(null);
+          setIsError(false);
+        }, 5000);
       });
-      window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername("");
-      setPassword("");
-    } catch (error) {
-      setIsError(true);
-      setErrorMessage(error.response.data.error);
-      setTimeout(() => {
-        setErrorMessage(null);
-        setIsError(false);
-      }, 5000);
-    }
   };
 
   const handleLogout = async (event) => {
@@ -70,41 +60,25 @@ const App = () => {
     setUser(null);
   };
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault();
-
-    try {
-      const newBlog = {
-        title: title,
-        author: author,
-        url: url,
-      };
-      const response = await blogService.create(newBlog);
-      blogFormRef.current.toggleVisibility();
-      setAuthor("");
-      setTitle("");
-      setUrl("");
-      setBlogs(blogs.concat(response));
-      setErrorMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`);
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-    } catch (error) {
-      console.log(error);
-    }
+  const handleCreateBlog = (newBlog) => {
+    blogService
+      .create(newBlog)
+      .then((response) => {
+        blogFormRef.current.toggleVisibility();
+        setBlogs(blogs.concat(response));
+        setErrorMessage(
+          `a new blog ${newBlog.title} by ${newBlog.author} added`
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      })
+      .catch((error) => console.log(error));
   };
 
   if (user === null) {
     return (
-      <LoginForm
-        handleLogin={handleLogin}
-        username={username}
-        password={password}
-        setUsername={setUsername}
-        setPassword={setPassword}
-        errorMessage={errorMessage}
-        isError={isError}
-      >
+      <LoginForm handleLogin={handleLogin}>
         <h2>Log in to application</h2>
         <Notification message={errorMessage} isError={isError} />
       </LoginForm>
@@ -123,15 +97,7 @@ const App = () => {
         hideButtonLabel="cancel"
         ref={blogFormRef}
       >
-        <BlogForm
-          handleCreateBlog={handleCreateBlog}
-          title={title}
-          author={author}
-          url={url}
-          setTitle={setTitle}
-          setAuthor={setAuthor}
-          setUrl={setUrl}
-        >
+        <BlogForm handleCreateBlog={handleCreateBlog}>
           <h2>create new</h2>
         </BlogForm>
       </Togglable>
