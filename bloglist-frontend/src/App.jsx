@@ -73,11 +73,11 @@ const App = () => {
         author: author,
         url: url,
       };
-      blogService.create(newBlog);
+      const response = await blogService.create(newBlog);
       setAuthor("");
       setTitle("");
       setUrl("");
-      setBlogs(await blogService.getAll());
+      setBlogs(blogs.concat(response));
       setErrorMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`);
       setTimeout(() => {
         setErrorMessage(null);
