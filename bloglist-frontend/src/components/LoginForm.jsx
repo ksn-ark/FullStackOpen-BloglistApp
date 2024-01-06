@@ -3,9 +3,9 @@ const LoginForm = ({ handleLogin, children }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const doLogin = (event) => {
+  const doLogin = async (event) => {
     event.preventDefault();
-    handleLogin({
+    await handleLogin({
       username: username,
       password: password,
     });

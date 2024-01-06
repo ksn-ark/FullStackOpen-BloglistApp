@@ -19,10 +19,12 @@ const App = () => {
 
   //useEffect
   useEffect(() => {
-    blogService.getAll().then((blogs) => {
+    async function fetchBlogs() {
+      const blogs = await blogService.getAll();
       blogs.sort((a, b) => b.likes - a.likes);
       setBlogs(blogs);
-    });
+    }
+    fetchBlogs();
   }, []);
 
   useEffect(() => {
@@ -38,23 +40,24 @@ const App = () => {
   const blogFormRef = useRef();
 
   //eventHandlers
-  const handleLogin = (user) => {
-    loginService
-      .login(user)
-      .then((user) => {
-        window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user));
-        blogService.setToken(user.token);
-        setUser(user);
-        return;
-      })
-      .catch((error) => {
-        setIsError(true);
-        setErrorMessage(error.response.data.error);
-        setTimeout(() => {
-          setErrorMessage(null);
-          setIsError(false);
-        }, 5000);
-      });
+  const handleLogin = async (user) => {
+    try {
+      const loggedInUser = await loginService.login(user);
+      window.localStorage.setItem(
+        "loggedNoteappUser",
+        JSON.stringify(loggedInUser)
+      );
+      blogService.setToken(loggedInUser.token);
+      setUser(loggedInUser);
+      return;
+    } catch (error) {
+      setIsError(true);
+      setErrorMessage(error.response.data.error);
+      setTimeout(() => {
+        setErrorMessage(null);
+        setIsError(false);
+      }, 5000);
+    }
   };
 
   const handleLogout = async (event) => {
@@ -63,93 +66,85 @@ const App = () => {
     setUser(null);
   };
 
-  const handleCreateBlog = (newBlog) => {
-    blogService
-      .create(newBlog)
-      .then((response) => {
-        blogFormRef.current.toggleVisibility();
-        const updatedBlogs = blogs
-          .concat(response)
-          .sort((a, b) => b.likes - a.likes);
-        setBlogs(updatedBlogs);
-        setErrorMessage(
-          `a new blog ${newBlog.title} by ${newBlog.author} added`
-        );
+  const handleCreateBlog = async (newBlog) => {
+    try {
+      const response = await blogService.create(newBlog);
+      blogFormRef.current.toggleVisibility();
+      const updatedBlogs = blogs
+        .concat(response)
+        .sort((a, b) => b.likes - a.likes);
+      setBlogs(updatedBlogs);
+      setErrorMessage(`a new blog ${newBlog.title} by ${newBlog.author} added`);
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error === "token expired"
+      ) {
+        setIsError(true);
+        setErrorMessage("session has expired login again");
+        setUser(null);
         setTimeout(() => {
           setErrorMessage(null);
+          setIsError(false);
         }, 5000);
-      })
-      .catch((error) => {
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.error === "token expired"
-        ) {
-          setIsError(true);
-          setErrorMessage("session has expired login again");
-          setUser(null);
-          setTimeout(() => {
-            setErrorMessage(null);
-            setIsError(false);
-          }, 5000);
-        } else {
-          console.log(error);
-        }
-      });
+      } else {
+        console.log(error);
+      }
+    }
   };
 
-  const handleRemoveBlog = (id) => {
-    blogService
-      .remove(id)
-      .then((response) => {
-        const updatedBlogs = blogs.filter((blog) => blog.id !== id);
-        setBlogs(updatedBlogs);
-      })
-      .catch((error) => {
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.error === "token expired"
-        ) {
-          setIsError(true);
-          setErrorMessage("session has expired login again");
-          setUser(null);
-          setTimeout(() => {
-            setErrorMessage(null);
-            setIsError(false);
-          }, 5000);
-        } else {
-          console.log(error);
-        }
-      });
+  const handleRemoveBlog = async (id) => {
+    try {
+      await blogService.remove(id);
+      const updatedBlogs = blogs.filter((blog) => blog.id !== id);
+      setBlogs(updatedBlogs);
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error === "token expired"
+      ) {
+        setIsError(true);
+        setErrorMessage("session has expired login again");
+        setUser(null);
+        setTimeout(() => {
+          setErrorMessage(null);
+          setIsError(false);
+        }, 5000);
+      } else {
+        console.log(error);
+      }
+    }
   };
 
-  const handleUpdateBlog = (modifiedBlog) => {
-    blogService
-      .update(modifiedBlog)
-      .then((response) => {
-        const updatedBlogs = blogs
-          .map((blog) => (blog.id === response.id ? response : blog))
-          .sort((a, b) => b.likes - a.likes);
-        setBlogs(updatedBlogs);
-      })
-      .catch((error) => {
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.error === "token expired"
-        ) {
-          setIsError(true);
-          setErrorMessage("session has expired login again");
-          setUser(null);
-          setTimeout(() => {
-            setErrorMessage(null);
-            setIsError(false);
-          }, 5000);
-        } else {
-          console.log(error);
-        }
-      });
+  const handleUpdateBlog = async (modifiedBlog, id) => {
+    try {
+      const response = await blogService.update(modifiedBlog, id);
+      const updatedBlogs = blogs
+        .map((blog) => (blog.id === response.id ? response : blog))
+        .sort((a, b) => b.likes - a.likes);
+      setBlogs(updatedBlogs);
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.error === "token expired"
+      ) {
+        setIsError(true);
+        setErrorMessage("session has expired login again");
+        setUser(null);
+        setTimeout(() => {
+          setErrorMessage(null);
+          setIsError(false);
+        }, 5000);
+      } else {
+        console.log(error);
+      }
+    }
   };
 
   //return

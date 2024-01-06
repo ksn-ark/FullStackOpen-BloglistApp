@@ -13,10 +13,19 @@ const Blog = ({ blog, user, handleUpdateBlog, handleRemoveBlog }) => {
 
   let bloglikes = blog.likes;
 
-  const addLike = (event) => {
+  const addLike = async (event) => {
     event.preventDefault();
     bloglikes += 1;
-    handleUpdateBlog({ likes: bloglikes, id: blog.id });
+    await handleUpdateBlog(
+      {
+        user: blog.user.id,
+        likes: bloglikes,
+        author: blog.author,
+        title: blog.title,
+        url: blog.url,
+      },
+      blog.id
+    );
   };
 
   const removeBlog = (event) => {
