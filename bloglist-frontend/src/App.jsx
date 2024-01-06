@@ -19,7 +19,10 @@ const App = () => {
 
   //useEffect
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    blogService.getAll().then((blogs) => {
+      blogs.sort((a, b) => b.likes - a.likes);
+      setBlogs(blogs);
+    });
   }, []);
 
   useEffect(() => {
@@ -65,7 +68,10 @@ const App = () => {
       .create(newBlog)
       .then((response) => {
         blogFormRef.current.toggleVisibility();
-        setBlogs(blogs.concat(response));
+        const updatedBlogs = blogs
+          .concat(response)
+          .sort((a, b) => b.likes - a.likes);
+        setBlogs(updatedBlogs);
         setErrorMessage(
           `a new blog ${newBlog.title} by ${newBlog.author} added`
         );
@@ -73,9 +79,80 @@ const App = () => {
           setErrorMessage(null);
         }, 5000);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error === "token expired"
+        ) {
+          setIsError(true);
+          setErrorMessage("session has expired login again");
+          setUser(null);
+          setTimeout(() => {
+            setErrorMessage(null);
+            setIsError(false);
+          }, 5000);
+        } else {
+          console.log(error);
+        }
+      });
   };
 
+  const handleRemoveBlog = (id) => {
+    blogService
+      .remove(id)
+      .then((response) => {
+        const updatedBlogs = blogs.filter((blog) => blog.id !== id);
+        setBlogs(updatedBlogs);
+      })
+      .catch((error) => {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error === "token expired"
+        ) {
+          setIsError(true);
+          setErrorMessage("session has expired login again");
+          setUser(null);
+          setTimeout(() => {
+            setErrorMessage(null);
+            setIsError(false);
+          }, 5000);
+        } else {
+          console.log(error);
+        }
+      });
+  };
+
+  const handleUpdateBlog = (modifiedBlog) => {
+    blogService
+      .update(modifiedBlog)
+      .then((response) => {
+        const updatedBlogs = blogs
+          .map((blog) => (blog.id === response.id ? response : blog))
+          .sort((a, b) => b.likes - a.likes);
+        setBlogs(updatedBlogs);
+      })
+      .catch((error) => {
+        if (
+          error.response &&
+          error.response.data &&
+          error.response.data.error === "token expired"
+        ) {
+          setIsError(true);
+          setErrorMessage("session has expired login again");
+          setUser(null);
+          setTimeout(() => {
+            setErrorMessage(null);
+            setIsError(false);
+          }, 5000);
+        } else {
+          console.log(error);
+        }
+      });
+  };
+
+  //return
   if (user === null) {
     return (
       <LoginForm handleLogin={handleLogin}>
@@ -102,7 +179,13 @@ const App = () => {
         </BlogForm>
       </Togglable>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          user={user}
+          handleUpdateBlog={handleUpdateBlog}
+          handleRemoveBlog={handleRemoveBlog}
+        />
       ))}
     </div>
   );
