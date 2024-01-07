@@ -39,7 +39,7 @@ const Blog = (props) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="blog">
       <div>
         {blog.title} {blog.author}{' '}
         <button onClick={() => setShowDetails(!showDetails)}>
@@ -47,7 +47,7 @@ const Blog = (props) => {
         </button>
       </div>
       {showDetails ? (
-        <div>
+        <div className="blog-details">
           <p>{blog.url}</p>
           <p>
             likes {blog.likes} <button onClick={addLike}>like</button>
