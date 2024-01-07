@@ -1,22 +1,23 @@
-import { useState } from "react";
+import { useState } from 'react'
+
 const LoginForm = ({ handleLogin, children }) => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
   const doLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     await handleLogin({
       username: username,
       password: password,
-    });
-  };
+    })
+  }
 
   return (
     <div>
       {children}
       <form onSubmit={doLogin}>
         <div>
-          username{"  "}
+          username{'  '}
           <input
             type="text"
             value={username}
@@ -24,7 +25,7 @@ const LoginForm = ({ handleLogin, children }) => {
             onChange={({ target }) => setUsername(target.value)}
           />
           <div>
-            passsword{"  "}
+            passsword{'  '}
             <input
               type="text"
               value={password}
@@ -36,7 +37,7 @@ const LoginForm = ({ handleLogin, children }) => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default LoginForm;
+export default LoginForm

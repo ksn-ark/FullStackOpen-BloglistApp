@@ -129,5 +129,6 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-#VSCode REST test extension
+#VSCode extensions
 requests/
+.prettierrc

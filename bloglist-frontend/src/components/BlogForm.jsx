@@ -1,27 +1,27 @@
-import { useState } from "react";
+import { useState } from 'react'
 
 const BlogForm = ({ handleCreateBlog, children }) => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   const addBlog = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     await handleCreateBlog({
       title: title,
       author: author,
       url: url,
-    });
-    setAuthor("");
-    setTitle("");
-    setUrl("");
-  };
+    })
+    setAuthor('')
+    setTitle('')
+    setUrl('')
+  }
   return (
     <div>
       {children}
       <form onSubmit={addBlog}>
         <div>
-          title{"  "}
+          title{'  '}
           <input
             type="text"
             name="Title"
@@ -30,7 +30,7 @@ const BlogForm = ({ handleCreateBlog, children }) => {
           />
         </div>
         <div>
-          author{"  "}
+          author{'  '}
           <input
             type="text"
             name="Author"
@@ -39,7 +39,7 @@ const BlogForm = ({ handleCreateBlog, children }) => {
           />
         </div>
         <div>
-          url{"  "}
+          url{'  '}
           <input
             type="text"
             name="Url"
@@ -50,7 +50,7 @@ const BlogForm = ({ handleCreateBlog, children }) => {
         <button type="submit">create</button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default BlogForm;
+export default BlogForm
