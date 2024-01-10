@@ -1,2 +1,2 @@
-# FullStackOpen-Part-4
-Coursework for full stack open part 4
+# FullStackOpen-BloglistApp
+Coursework bloglist app for full stack open
