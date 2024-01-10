@@ -15,13 +15,13 @@ const LoginForm = ({ handleLogin, children }) => {
   return (
     <div>
       {children}
-      <form onSubmit={doLogin}>
+      <form onSubmit={doLogin} className="login-form">
         <div>
           username{'  '}
           <input
             type="text"
             value={username}
-            name="Username"
+            id="username"
             onChange={({ target }) => setUsername(target.value)}
           />
           <div>
@@ -29,11 +29,13 @@ const LoginForm = ({ handleLogin, children }) => {
             <input
               type="text"
               value={password}
-              name="Password"
+              id="password"
               onChange={({ target }) => setPassword(target.value)}
             />
           </div>
-          <button type="submit">login</button>
+          <button id="login-button" type="submit">
+            login
+          </button>
         </div>
       </form>
     </div>

@@ -14,15 +14,12 @@ const Blog = (props) => {
 
   const [showDetails, setShowDetails] = useState(false)
 
-  let bloglikes = blog.likes
-
   const addLike = async (event) => {
     event.preventDefault()
-    bloglikes += 1
     await props.handleUpdateBlog(
       {
         user: blog.user.id,
-        likes: bloglikes,
+        likes: blog.likes + 1,
         author: blog.author,
         title: blog.title,
         url: blog.url,

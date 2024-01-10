@@ -19,12 +19,12 @@ const BlogForm = ({ handleCreateBlog, children }) => {
   return (
     <div>
       {children}
-      <form onSubmit={addBlog}>
+      <form onSubmit={addBlog} className="blog-form">
         <div>
           title{'  '}
           <input
             type="text"
-            name="Title"
+            id="title"
             value={title}
             onChange={({ target }) => setTitle(target.value)}
             placeholder="enter title here"
@@ -34,7 +34,7 @@ const BlogForm = ({ handleCreateBlog, children }) => {
           author{'  '}
           <input
             type="text"
-            name="Author"
+            id="author"
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
             placeholder="enter author here"
@@ -44,13 +44,15 @@ const BlogForm = ({ handleCreateBlog, children }) => {
           url{'  '}
           <input
             type="text"
-            name="Url"
+            id="url"
             value={url}
             onChange={({ target }) => setUrl(target.value)}
             placeholder="enter url here"
           />
         </div>
-        <button type="submit">create</button>
+        <button id="create-blog-button" type="submit">
+          create
+        </button>
       </form>
     </div>
   )
